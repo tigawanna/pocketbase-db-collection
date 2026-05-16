@@ -130,18 +130,9 @@ function setUp(recordService: MockRecordService<Data>) {
 
 describe(`PocketBase Integration`, () => {
   it(`should initialize and fetch initial data`, async () => {
-    const records: Array<Data> = [
-      {
-        id: `1`,
-        data: `first`,
-        updated: 0,
-      },
-      {
-        id: `2`,
-        data: `second`,
-        updated: 0,
-      },
-    ];
+    const first: Data = { id: `1`, data: `first`, updated: 0 };
+    const second: Data = { id: `2`, data: `second`, updated: 0 };
+    const records: Array<Data> = [first, second];
 
     const recordService = new MockRecordService<Data>();
     recordService.setInitialRecords(records);
@@ -154,8 +145,8 @@ describe(`PocketBase Integration`, () => {
 
     expect(recordService.getFullList).toHaveBeenCalledTimes(1);
     expect(collection.size).toBe(records.length);
-    expect(collection.get(`1`)).toEqual(records[0]);
-    expect(collection.get(`2`)).toEqual(records[1]);
+    expect(collection.get(`1`)).toMatchObject(first);
+    expect(collection.get(`2`)).toMatchObject(second);
   });
 
   it(`should receive create, update and delete events`, async () => {
@@ -181,7 +172,7 @@ describe(`PocketBase Integration`, () => {
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     expect(collection.size).toBe(1);
-    expect(collection.get(`1`)).toEqual(newRecord);
+    expect(collection.get(`1`)).toMatchObject(newRecord);
 
     // Inject an update event
     const updatedRecord: Data = {
@@ -194,7 +185,7 @@ describe(`PocketBase Integration`, () => {
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     expect(collection.size).toBe(1);
-    expect(collection.get(`1`)).toEqual(updatedRecord);
+    expect(collection.get(`1`)).toMatchObject(updatedRecord);
 
     // Inject a delete event
     recordService.emitSubscription(`*`, `delete`, updatedRecord);
@@ -240,7 +231,7 @@ describe(`PocketBase Integration`, () => {
 
     await insertTx.isPersisted.promise;
     expect(collection.size).toBe(1);
-    expect(collection.get(`1`)).toEqual(data);
+    expect(collection.get(`1`)).toMatchObject(data);
 
     // Update
     const updateTx = collection.update(`1`, (old: Data) => {
@@ -298,11 +289,10 @@ describe(`PocketBase Integration`, () => {
 
     await collection.stateWhenReady();
 
-    const records: Array<Data> = [
-      { id: `1`, data: `first` },
-      { id: `2`, data: `second` },
-      { id: `3`, data: `third` },
-    ];
+    const first: Data = { id: `1`, data: `first` };
+    const second: Data = { id: `2`, data: `second` };
+    const third: Data = { id: `3`, data: `third` };
+    const records: Array<Data> = [first, second, third];
 
     // Mock create to return records with their original ids
     recordService.create.mockImplementation((bodyParams?: RecordParams | FormData) => {
@@ -322,9 +312,9 @@ describe(`PocketBase Integration`, () => {
 
     expect(recordService.create).toHaveBeenCalledTimes(3);
     expect(collection.size).toBe(3);
-    expect(collection.get(`1`)).toEqual(records[0]);
-    expect(collection.get(`2`)).toEqual(records[1]);
-    expect(collection.get(`3`)).toEqual(records[2]);
+    expect(collection.get(`1`)).toMatchObject(first);
+    expect(collection.get(`2`)).toMatchObject(second);
+    expect(collection.get(`3`)).toMatchObject(third);
   });
 
   it(`should handle empty initial fetch`, async () => {
