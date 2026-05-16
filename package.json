@@ -80,6 +80,5 @@
   "peerDependencies": {
     "@tanstack/db": "^0.6.0",
     "pocketbase": "^0.26.0"
-  },
-  "sideEffects": false
+  }
 }
